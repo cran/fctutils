@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>fctutils: Advanced Factor Manipulation Utilities</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>fctutils: Advanced Factor Manipulation Utilities</h1></div>
+<div class="author"><h2>Kai Guo, University of Michigan</h2></div>
+<div class="date"><h3>2024-09-23</h3></div>
+</div>
+<div class="body">
+<p>The <code>fctutils</code> package provides a comprehensive suite of utilities for advanced manipulation and analysis of factor vectors in R. It offers tools for splitting, combining, reordering, filtering, and transforming factor levels based on various criteria. Designed to enhance the handling of categorical data, <code>fctutils</code> simplifies complex factor operations, making it easier to preprocess and analyze data in R.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Advanced Sorting and Reordering</strong>: Sort factor levels based on custom functions, external vectors, or associated data.</li>
+<li><strong>Factor Level Manipulation</strong>: Functions to split, collapse, map, and extract substrings from factor levels.</li>
+<li><strong>Grouping and Aggregation</strong>: Aggregate factor levels based on grouping variables or hierarchical categories.</li>
+<li><strong>Handling Missing Data</strong>: Impute missing values in factors using various methods.</li>
+<li><strong>Consistency Across Datasets</strong>: Ensure consistent factor levels across multiple vectors or datasets.</li>
+</ul>
+<h2 id="1-software-usage">1. Software Usage</h2>
+<h3 id="1-1-installation">1.1 Installation</h3>
+<p>Install the package with its dependencies and load it for usage in R.</p>
+<pre><code class="language-r">library(devtools) # Load the devtools package
+install_github(&quot;guokai8/fctutils&quot;) # Install the package
+</code></pre>
+<h2 id="2-useful-functions">2. Useful functions</h2>
+<h3 id="2-1-ordering-and-sorting-factors">2.1 Ordering and Sorting Factors</h3>
+<p><em>fct_pos</em> Reorders the levels of a factor vector based on the characters at specified positions within the factor levels.</p>
+<pre><code class="language-r">library(fctutils)
+factor_vec &lt;- factor(c('Apple', 'banana', 'Cherry', 'date', 'Fig', 'grape'))
+# Reorder based on positions 1 and 3, case-insensitive
+fct_pos(factor_vec, positions = c(1, 3))
+</code></pre>
+<pre><code>## [1] Apple  banana Cherry date   Fig    grape 
+## Levels: Apple banana Cherry date Fig grape
+</code></pre>
+<pre><code class="language-r"># Reorder based on positions 3, case-insensitive, inplace = TRUE
+fct_pos(factor_vec, positions = 3, inplace = TRUE)
+</code></pre>
+<pre><code>## [1] grape  Cherry Fig    banana Apple  date  
+## Levels: grape Cherry Fig banana Apple date
+</code></pre>
+<pre><code class="language-r"># Reorder in decreasing order, case-sensitive
+fct_pos(factor_vec, positions = 1:2, case = TRUE, decreasing = TRUE)
+</code></pre>
+<pre><code>## [1] Apple  banana Cherry date   Fig    grape 
+## Levels: grape date banana Fig Cherry Apple
+</code></pre>
+<p><em>fct_count</em> Reorders the levels of a factor vector based on the count of each level in the data.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'apple', 'cherry', 'banana', 'banana', 'date'))
+
+# Reorder levels by decreasing count
+fct_count(factor_vec)
+</code></pre>
+<pre><code>## [1] apple  banana apple  cherry banana banana date  
+## Levels: banana apple cherry date
+</code></pre>
+<pre><code class="language-r"># Reorder levels by increasing count
+fct_count(factor_vec, decreasing = FALSE)
+</code></pre>
+<pre><code>## [1] apple  banana apple  cherry banana banana date  
+## Levels: cherry date apple banana
+</code></pre>
+<p><em>fct_sub</em> Reorders the levels of a factor vector based on substrings extracted from the factor levels.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('Apple', 'banana', 'Cherry', 'date', 'Fig', 'grape'))
+# Reorder based on substring from position 2 to 4
+fct_sub(factor_vec, start_pos = 2, end_pos = 4)
+</code></pre>
+<pre><code>## [1] banana date   Cherry Fig    Apple  grape 
+## Levels: banana date Cherry Fig Apple grape
+</code></pre>
+<pre><code class="language-r"># Reorder from position 3 to end, case-sensitive
+fct_sub(factor_vec, start_pos = 3, case = TRUE)
+</code></pre>
+<pre><code>## [1] grape  Cherry Fig    banana Apple  date  
+## Levels: grape Cherry Fig banana Apple date
+</code></pre>
+<p><em>fct_freq</em> Reorders the levels of a factor vector based on the total frequency of characters appearing in the vector.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry', 'date', 'banana', 'apple', 'fig'))
+
+# Reorder levels based on total character frequency
+fct_freq(factor_vec)
+</code></pre>
+<pre><code>## [1] apple  banana cherry date   banana apple  fig   
+## Levels: banana apple date cherry fig
+</code></pre>
+<pre><code class="language-r"># Reorder levels, case-sensitive
+factor_vec_case &lt;- factor(c('Apple', 'banana', 'Cherry', 'date', 'banana', 'apple', 'Fig'))
+fct_freq(factor_vec_case, case = TRUE)
+</code></pre>
+<pre><code>## [1] Apple  banana Cherry date   banana apple  Fig   
+## Levels: banana apple Apple date Cherry Fig
+</code></pre>
+<p><em>fct_char_freq</em> Reorders the levels of a factor vector based on the frequency of characters at specified positions within the data.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'apricot', 'cherry', 'banana', 'banana', 'date'))
+
+# Reorder based on characters at positions 1 and 2
+fct_char_freq(factor_vec, positions = 1:2)
+</code></pre>
+<pre><code>## [1] banana  banana  banana  apricot apple   date    cherry 
+## Levels: banana apricot apple date cherry
+</code></pre>
+<pre><code class="language-r"># Reorder, case-sensitive, decreasing order
+fct_char_freq(factor_vec, positions = c(1, 3), case = TRUE)
+</code></pre>
+<pre><code>## [1] banana  banana  banana  date    cherry  apricot apple  
+## Levels: banana date cherry apricot apple
+</code></pre>
+<p><em>fct_substr_freq</em> Reorders the levels of a factor vector based on the frequency of substrings extracted from the data.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'apricot', 'cherry', 'banana', 'banana', 'date'))
+fct_substr_freq(factor_vec, start_pos = 2, end_pos=3)
+</code></pre>
+<pre><code>## [1] banana  banana  banana  date    cherry  apricot apple  
+## Levels: banana date cherry apricot apple
+</code></pre>
+<p><em>fct_regex_freq</em> Reorders the levels of a factor vector based on the frequency of substrings matching a regular expression.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'apricot', 'cherry', 'blueberry', 'blackberry', 'date'))
+
+# Reorder based on pattern matching 'a'
+fct_regex_freq(factor_vec, pattern = 'a')
+</code></pre>
+<pre><code>## [1] date       blackberry banana     apricot    apple      cherry     blueberry 
+## Levels: date blackberry banana apricot apple cherry blueberry
+</code></pre>
+<pre><code class="language-r"># Reorder with case-sensitive matching
+fct_regex_freq(factor_vec, pattern = '^[A-Z]', case = TRUE)
+</code></pre>
+<pre><code>## [1] date       cherry     blueberry  blackberry banana     apricot    apple     
+## Levels: date cherry blueberry blackberry banana apricot apple
+</code></pre>
+<p><em>fct_split</em> Splits the levels of a factor vector using specified patterns or positions and reorders based on specified parts or criteria.</p>
+<pre><code class="language-r"># Example factor vector with patterns
+factor_vec &lt;- factor(c('item1-sub1', 'atem2_aub2', 'item3|sub3', 'item1-sub4'))
+
+# Split by patterns '-', '_', or '|' and reorder based on the first part
+fct_split(factor_vec, split_pattern = c('-', '_', '\\|'), part = 1)
+</code></pre>
+<pre><code>## [1] item1-sub1 atem2_aub2 item3|sub3 item1-sub4
+## Levels: atem2_aub2 item1-sub1 item1-sub4 item3|sub3
+</code></pre>
+<pre><code class="language-r"># Use the second pattern '_' for splitting
+fct_split(factor_vec, split_pattern = c('-', '_', '\\|'), use_pattern = 2, part = 2)
+</code></pre>
+<pre><code>## [1] item1-sub1 atem2_aub2 item3|sub3 item1-sub4
+## Levels: item1-sub1 item3|sub3 item1-sub4 atem2_aub2
+</code></pre>
+<pre><code class="language-r"># Reorder based on character frequencies in the specified part
+fct_split(factor_vec, split_pattern = '-', part = 2, char_freq = TRUE)
+</code></pre>
+<pre><code>## [1] item1-sub1 atem2_aub2 item3|sub3 item1-sub4
+## Levels: atem2_aub2 item3|sub3 item1-sub1 item1-sub4
+</code></pre>
+<p><em>fct_len</em> Reorders the levels of a factor vector based on the character length of each level.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry', 'date'))
+
+# Sort levels by length
+fct_len(factor_vec)
+</code></pre>
+<pre><code>## [1] apple  banana cherry date  
+## Levels: date apple banana cherry
+</code></pre>
+<p><em>fct_sort</em> Sorts the levels of a factor vector based on the values of another vector or a column from a data frame. Handles cases where the sorting vector may contain <code>NA</code>s.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry', 'date'))
+by_vec &lt;- c(2, 3, 1, NA)
+fct_sort(factor_vec, by = by_vec)
+</code></pre>
+<pre><code>## [1] apple  banana cherry date  
+## Levels: cherry apple banana date
+</code></pre>
+<pre><code class="language-r"># Example using a data frame column
+data &lt;- data.frame(
+  Category = factor(c('apple', 'banana', 'cherry', 'date')),
+  Value = c(2, 3, 1, NA)
+)
+fct_sort(data$Category, by = data$Value)
+</code></pre>
+<pre><code>## [1] apple  banana cherry date  
+## Levels: cherry apple banana date
+</code></pre>
+<p><em>fct_sort_custom</em> Reorders the levels of a factor vector based on a custom function applied to each level.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry'))
+
+# Sort levels by reverse alphabetical order
+fct_sort_custom(factor_vec, function(x) -rank(x))
+</code></pre>
+<pre><code>## [1] apple  banana cherry
+## Levels: cherry banana apple
+</code></pre>
+<pre><code class="language-r"># Sort levels by length of the level name
+fct_sort_custom(factor_vec, function(x) nchar(x))
+</code></pre>
+<pre><code>## [1] apple  banana cherry
+## Levels: apple banana cherry
+</code></pre>
+<h3 id="2-2-replacing-factor-levels">2.2 Replacing Factor Levels</h3>
+<p><em>fct_replace</em> Replaces a specified level in a factor vector with a new level. If a position is provided, the new level is inserted at the specified position among the levels; otherwise, the original level order is preserved.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry', 'date', 'fig', 'grape'))
+
+# replace 'banana' as 'blueberry', and keep original order
+fct_replace(factor_vec, old_level = 'banana', new_level = 'blueberry')
+</code></pre>
+<pre><code>## [1] apple     blueberry cherry    date      fig       grape    
+## Levels: apple blueberry cherry date fig grape
+</code></pre>
+<pre><code class="language-r"># replace 'banana' as 'blueberry'
+fct_replace(factor_vec, old_level = 'banana', new_level = 'blueberry', position = 2)
+</code></pre>
+<pre><code>## [1] apple     blueberry cherry    date      fig       grape    
+## Levels: apple blueberry cherry date fig grape
+</code></pre>
+<p><em>fct_replace_pattern</em> Replaces parts of the factor levels that match a specified pattern with a new string.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple_pie', 'banana_bread', 'cherry_cake'))
+
+# Replace '_pie', '_bread', '_cake' with '_dessert'
+fct_replace_pattern(factor_vec, pattern = '_.*', replacement = '_dessert')
+</code></pre>
+<pre><code>## [1] apple_dessert  banana_dessert cherry_dessert
+## Levels: apple_dessert banana_dessert cherry_dessert
+</code></pre>
+<h3 id="2-3-filtering-and-removing-factor-levels">2.3 Filtering and Removing Factor Levels</h3>
+<p><em>fct_filter_freq</em> Filters out factor levels that occur less than a specified frequency threshold and recalculates character frequencies excluding the removed levels. Offers options to handle NA values and returns additional information.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry', 'date', 'banana', 'apple', 'fig', NA))
+
+# Filter levels occurring less than 2 times and reorder by character frequency
+fct_filter_freq(factor_vec, min_freq = 2)
+</code></pre>
+<pre><code>## [1] apple  banana banana apple 
+## Levels: banana apple
+</code></pre>
+<pre><code class="language-r"># Filter levels, remove NA values, and return additional information
+result &lt;- fct_filter_freq(factor_vec, min_freq = 2, na.rm = TRUE, return_info = TRUE)
+result$filtered_factor
+</code></pre>
+<pre><code>## [1] apple  banana banana apple 
+## Levels: banana apple
+</code></pre>
+<pre><code class="language-r">result$removed_levels
+</code></pre>
+<pre><code>## [1] &quot;cherry&quot; &quot;date&quot;   &quot;fig&quot;
+</code></pre>
+<pre><code class="language-r">result$char_freq_table
+</code></pre>
+<pre><code>## all_chars
+## a b e l n p 
+## 8 2 2 2 4 4
+</code></pre>
+<p><em>fct_filter_pos</em> Removes factor levels where a specified character appears at specified positions within the levels.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'apricot', 'cherry', 'date', 'fig', 'grape'))
+
+# Remove levels where 'a' appears at position 1
+fct_filter_pos(factor_vec, positions = 1, char = 'a')
+</code></pre>
+<pre><code>## [1] banana cherry date   fig    grape 
+## Levels: banana cherry date fig grape
+</code></pre>
+<pre><code class="language-r"># Remove levels where 'e' appears at positions 2 or 3
+fct_filter_pos(factor_vec, positions = c(2, 3), char = 'e')
+</code></pre>
+<pre><code>## [1] apple   banana  apricot date    fig     grape  
+## Levels: apple apricot banana date fig grape
+</code></pre>
+<pre><code class="language-r"># Case-sensitive removal
+factor_vec_case &lt;- factor(c('Apple', 'banana', 'Apricot', 'Cherry', 'Date', 'Fig', 'grape'))
+fct_filter_pos(factor_vec_case, positions = 1, char = 'A', case = TRUE)
+</code></pre>
+<pre><code>## [1] banana Cherry Date   Fig    grape 
+## Levels: Cherry Date Fig banana grape
+</code></pre>
+<p><em>fct_remove_levels</em> Removes specified levels from a factor vector, keeping the remaining levels and their order unchanged.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry', 'date', 'fig', 'grape'))
+
+# Remove levels 'banana' and 'date'
+fct_remove_levels(factor_vec, levels_to_remove = c('banana', 'date'))
+</code></pre>
+<pre><code>## [1] apple  cherry fig    grape 
+## Levels: apple cherry fig grape
+</code></pre>
+<p><em>fct_filter_func</em> Removes levels from a factor vector based on a user-defined  function.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry', 'date'))
+
+# Remove levels that start with 'b'
+fct_filter_func(factor_vec, function(x) !grepl('^b', x))
+</code></pre>
+<pre><code>## [1] apple  &lt;NA&gt;   cherry date  
+## Levels: apple cherry date
+</code></pre>
+<h3 id="2-4-merging-factor-vectors">2.4 Merging Factor Vectors</h3>
+<p><em>fct_merge_similar</em> Merges levels of a factor that are similar based on string distance.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'appel', 'banana', 'bananna', 'cherry'))
+
+# Merge similar levels
+fct_merge_similar(factor_vec, max_distance = 1)
+</code></pre>
+<pre><code>## [1] apple  appel  banana banana cherry
+## Levels: appel apple banana cherry
+</code></pre>
+<p><em>fct_concat</em> Combines multiple factor vectors into a single factor, unifying the levels.</p>
+<pre><code class="language-r">factor_vec1 &lt;- factor(c('apple', 'banana'))
+factor_vec2 &lt;- factor(c('cherry', 'date'))
+
+# Concatenate factors
+concatenated_factor &lt;- fct_concat(factor_vec1, factor_vec2)
+levels(concatenated_factor)
+</code></pre>
+<pre><code>## [1] &quot;apple&quot;  &quot;banana&quot; &quot;cherry&quot; &quot;date&quot;
+</code></pre>
+<p><em>fct_combine</em> Combines two vectors, which may be of unequal lengths, into a factor vector and sorts based on the levels of either the first or second vector.</p>
+<pre><code class="language-r">vector1 &lt;- c('apple', 'banana', 'cherry')
+vector2 &lt;- c('date', 'fig', 'grape', 'honeydew')
+
+# Combine and sort based on vector1 levels
+fct_combine(vector1, vector2, sort_by = 1)
+</code></pre>
+<pre><code>## [1] apple    banana   cherry   date     fig      grape    honeydew
+## Levels: apple banana cherry date fig grape honeydew
+</code></pre>
+<pre><code class="language-r"># Combine and sort based on vector2 levels
+fct_combine(vector1, vector2, sort_by = 2)
+</code></pre>
+<pre><code>## [1] apple    banana   cherry   date     fig      grape    honeydew
+## Levels: date fig grape honeydew apple banana cherry
+</code></pre>
+<h3 id="2-5-other-useful-functions">2.5 Other Useful Functions</h3>
+<p><em>fct_insert</em> Inserts one or more new levels into a factor vector immediately after specified target levels. Targets can be identified by exact matches, positions, or pattern-based matching. Supports case sensitivity and handling of \code{NA} values. Can handle multiple insertions and maintains the original order of other levels. If a new level already exists in the factor and \code{allow_duplicates} is \code{FALSE}, it is moved to the desired position without duplication. If \code{allow_duplicates} is \code{TRUE}, unique duplicates are created.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('apple', 'banana', 'cherry', 'date', 'fig', 'grape'))
+fct_insert(factor_vec, insert = 'date', target = 'banana', inplace = TRUE)
+</code></pre>
+<pre><code>## [1] apple  banana date   cherry fig    grape 
+## Levels: apple banana date cherry fig grape
+</code></pre>
+<pre><code class="language-r">fct_insert(factor_vec, insert = c('date', 'grape'), positions = c(2, 4))
+</code></pre>
+<pre><code>## [1] apple  banana cherry date   fig    grape 
+## Levels: apple banana date cherry grape fig
+</code></pre>
+<pre><code class="language-r">fct_insert(factor_vec, insert = 'honeydew', pattern = '^c')
+</code></pre>
+<pre><code>## [1] apple  banana cherry date   fig    grape 
+## Levels: apple banana cherry honeydew date fig grape
+</code></pre>
+<pre><code class="language-r">factor_vec_na &lt;- factor(c('apple', NA, 'banana', 'cherry', NA, 'date'))
+fct_insert(factor_vec_na, insert = 'lychee', insert_after_na = TRUE)
+</code></pre>
+<pre><code>## Warning in fct_insert(factor_vec_na, insert = &quot;lychee&quot;, insert_after_na =
+## TRUE): No target levels found for insertion. Returning the original factor.
+</code></pre>
+<pre><code>## [1] apple  &lt;NA&gt;   banana cherry &lt;NA&gt;   date  
+## Levels: apple banana cherry date
+</code></pre>
+<p><em>fct_intersect</em> Combines multiple factor vectors and returns a factor vector containing only the levels common to all.</p>
+<pre><code class="language-r">factor_vec1 &lt;- factor(c('apple', 'banana', 'cherry'))
+factor_vec2 &lt;- factor(c('banana', 'date', 'cherry'))
+factor_vec3 &lt;- factor(c('banana', 'cherry', 'fig'))
+
+# Get intersection of levels
+fct_intersect(factor_vec1, factor_vec2, factor_vec3)
+</code></pre>
+<pre><code>## [1] banana cherry banana cherry banana cherry
+## Levels: banana cherry
+</code></pre>
+<p><em>fct_union</em> Combines multiple factor vectors and returns a factor vector containing all unique levels.</p>
+<pre><code class="language-r">factor_vec1 &lt;- factor(c('apple', 'banana'))
+factor_vec2 &lt;- factor(c('banana', 'cherry'))
+factor_vec3 &lt;- factor(c('date', 'fig'))
+
+# Get union of levels
+fct_union(factor_vec1, factor_vec2, factor_vec3)
+</code></pre>
+<pre><code>## [1] apple  banana banana cherry date   fig   
+## Levels: apple banana cherry date fig
+</code></pre>
+<p><em>fct_reorder_within</em> Reorders the levels of a factor vector within groups defined by another factor vector.</p>
+<pre><code class="language-r">data &lt;- data.frame(
+  item = factor(c('A', 'B', 'C', 'D', 'E', 'F')),
+  group = factor(c('G1', 'G1', 'G1', 'G2', 'G2', 'G2')),
+  value = c(10, 15, 5, 20, 25, 15)
+)
+data &lt;- rbind(data, data)
+# Reorder 'item' within 'group' by 'value'
+data$item &lt;- fct_reorder_within(data$item, data$group, data$value, mean)
+</code></pre>
+<p><em>fct_extract</em> Extracts substrings from the levels of a factor vector based on a regular expression pattern and creates a new factor.</p>
+<pre><code class="language-r">factor_vec &lt;- factor(c('item123', 'item456', 'item789'))
+
+# Extract numeric part
+fct_extract(factor_vec, pattern = '\\d+')
+</code></pre>
+<pre><code>## [1] 123 456 789
+## Levels: 123 456 789
+</code></pre>
+<pre><code class="language-r"># Extract with capturing group
+factor_vec &lt;- factor(c('apple: red', 'banana: yellow', 'cherry: red'))
+fct_extract(factor_vec, pattern = '^(\\w+):', capture_group = 1)
+</code></pre>
+<pre><code>## [1] apple  banana cherry
+## Levels: apple banana cherry
+</code></pre>
+<p><em>fct_pad_levels</em> Pads the levels of a factor vector with leading characters to achieve a specified width.</p>
+<pre><code class="language-r"># Example factor vector
+factor_vec &lt;- factor(c('A', 'B', 'C', 'D'))
+
+# Pad levels to width 4 using '0' as padding character
+padded_factor &lt;- fct_pad_levels(factor_vec, width = 4, pad_char = '0')
+print(levels(padded_factor))
+</code></pre>
+<pre><code>## [1] &quot;000A&quot; &quot;000B&quot; &quot;000C&quot; &quot;000D&quot;
+</code></pre>
+<pre><code class="language-r"># Output: &quot;000A&quot; &quot;000B&quot; &quot;000C&quot; &quot;000D&quot;
+
+# Pad levels to width 6 using '%A' as padding string
+padded_factor &lt;- fct_pad_levels(factor_vec, width = 6, pad_char = '%A')
+print(levels(padded_factor))
+</code></pre>
+<pre><code>## [1] &quot;%A%%A%A&quot; &quot;%A%%A%B&quot; &quot;%A%%A%C&quot; &quot;%A%%A%D&quot;
+</code></pre>
+<pre><code class="language-r"># Output: &quot;%%A%A&quot; &quot;%%A%B&quot; &quot;%%A%C&quot; &quot;%%A%D&quot;
+</code></pre>
+<p><em>fct_level_stats</em> Computes statistical summaries for each level of a factor vector based on associated numeric data. (group_by and summarize).</p>
+<p><em>fct_pattern_replace</em> Replaces substrings in factor levels that match a pattern with a replacement string.</p>
+<p><em>fct_impute</em> Replaces \code{NA} values in a factor vector using specified imputation methods.</p>
+<p><em>fct_unique_comb</em> Generates a new factor where each level represents a unique combination of levels from the input factors.</p>
+<p><em>fct_map_func</em> Transforms factor levels by applying a function that can include complex logic.</p>
+<p><em>fct_collapse_lev</em> Collapses specified levels of a factor into new levels based on a grouping list.</p>
+<p><em>fct_duplicates</em> Identifies duplicate levels in a factor vector and returns a logical vector indicating which elements are duplicates.</p>
+<p><em>fct_dummy</em> Generates a data frame of dummy variables (one-hot encoded) from a factor vector.</p>
+<p><em>fct_replace_na</em> Replaces \code{NA} values in a factor vector with a specified level.</p>
+<p><em>fct_sample_levels</em> Randomly selects a specified number of levels from a factor vector.</p>
+<p><em>fct_apply</em> Transforms factor levels by applying a function to each level.</p>
+<p><em>fct_encode</em> Converts the levels of a factor vector into numeric codes, optionally using a provided mapping.</p>
+<h2 id="3-summary">3. Summary</h2>
+<p>The <code>fctutils</code> package provides a comprehensive set of functions to efficiently manage and manipulate factor vectors in R. From ordering and sorting to replacing, filtering, merging, and beyond, these tools enhance your ability to handle categorical data with ease. The additional essential functions further extend the package’s capabilities, ensuring that all common factor operations are covered.</p>
+<h2 id="4-contact-information">4. Contact information</h2>
+<p>For any questions please contact <a href="mailto:guokai8@gmail.com">guokai8@gmail.com</a> or submit the issues to <a href="https://github.com/guokai8/fctutils/issues">https://github.com/guokai8/fctutils/issues</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+</body>
+</html>
