@@ -10,13 +10,13 @@
 #' factor_vec <- factor(c('apple', 'banana', 'cherry', 'date', 'fig', 'grape'))
 #'
 #' # replace 'banana' as 'blueberry', and keep original order
-#' fct_replace(factor_vec, old_level = 'banana', new_level = 'blueberry')
+#' ft_replace(factor_vec, old_level = 'banana', new_level = 'blueberry')
 #'
 #' # replace 'banana' as 'blueberry'
-#' fct_replace(factor_vec, old_level = 'banana', new_level = 'blueberry', position = 2)
+#' ft_replace(factor_vec, old_level = 'banana', new_level = 'blueberry', position = 2)
 #' @export
 #' @author Kai Guo
-fct_replace <- function(factor_vec, old_level, new_level, position = NULL) {
+ft_replace <- function(factor_vec, old_level, new_level, position = NULL) {
   #
   if(!is.factor(factor_vec)){
     factor_vec <- as.factor(factor_vec)
@@ -73,16 +73,20 @@ fct_replace <- function(factor_vec, old_level, new_level, position = NULL) {
 #' @param factor_vec A factor vector to be modified.
 #' @param pattern A regular expression pattern to match.
 #' @param replacement A string to replace the matched parts.
+#' @param replace_all Logical. If \code{TRUE} (default), all occurrences of the pattern are replaced. If \code{FALSE}, only the first occurrence is replaced.
 #' @return A factor vector with levels modified.
 #' @examples
 #' # Example factor vector
 #' factor_vec <- factor(c('apple_pie', 'banana_bread', 'cherry_cake'))
 #'
-#' # Replace '_pie', '_bread', '_cake' with '_dessert'
-#' fct_replace_pattern(factor_vec, pattern = '_.*', replacement = '_dessert')
+#' # Replace '_pie', '_bread', '_cake' with '_dessert' (all occurrences)
+#' ft_replace_pattern(factor_vec, pattern = '_.*', replacement = '_dessert')
+#'
+#' # Replace only the first occurrence of '_' with '-'
+#' ft_replace_pattern(factor_vec, pattern = '_', replacement = '-', replace_all = FALSE)
 #' @export
 #' @author Kai Guo
-fct_replace_pattern <- function(factor_vec, pattern, replacement) {
+ft_replace_pattern <- function(factor_vec, pattern, replacement, replace_all = TRUE) {
   # Parameter validation
   if(!is.factor(factor_vec)){
     factor_vec <- as.factor(factor_vec)
@@ -93,9 +97,16 @@ fct_replace_pattern <- function(factor_vec, pattern, replacement) {
   if (!is.character(replacement) || length(replacement) != 1) {
     stop("The 'replacement' parameter must be a single character string.")
   }
+  if (!is.logical(replace_all) || length(replace_all) != 1) {
+    stop("The 'replace_all' parameter must be a single logical value (TRUE or FALSE).")
+  }
 
-  # Replace pattern in levels
-  new_levels <- gsub(pattern, replacement, levels(factor_vec))
+  # Choose the appropriate replacement function based on replace_all
+  if (replace_all) {
+    new_levels <- gsub(pattern, replacement, levels(factor_vec))
+  } else {
+    new_levels <- sub(pattern, replacement, levels(factor_vec))
+  }
 
   # Update factor levels
   factor_vec <- factor(factor_vec, levels = levels(factor_vec), labels = new_levels)
@@ -116,10 +127,10 @@ fct_replace_pattern <- function(factor_vec, pattern, replacement) {
 #' factor_vec2 <- factor(c('banana', 'date', 'fig', 'grape'))
 #'
 #' # Merge factors and retain unique levels
-#' fct_merge(factor_vec1, factor_vec2)
+#' ft_merge(factor_vec1, factor_vec2)
 #' @export
 #' @author Kai Guo
-fct_merge <- function(factor_vec1, factor_vec2, level_order = NULL) {
+ft_merge <- function(factor_vec1, factor_vec2, level_order = NULL) {
   #
   if(!is.factor(factor_vec1) || !is.factor(factor_vec2)){
     factor_vec1 <- as.factor(factor_vec1)
